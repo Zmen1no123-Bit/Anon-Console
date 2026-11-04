@@ -209,7 +209,14 @@ function adminRoute(req, res, url) {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
 
-  if (url.pathname.startsWith('/admin')) return adminRoute(req, res, url);
+  if (url.pathname === '/admin' || url.pathname === '/admin/') {
+  return fs.readFile(path.join(PUBLIC_DIR, 'admin.html'), (err, data) => {
+    if (err) { res.writeHead(404); return res.end('Not found'); }
+    res.writeHead(200, { 'Content-Type': MIME['.html'] });
+    res.end(data);
+  });
+}
+if (url.pathname.startsWith('/admin/')) return adminRoute(req, res, url);
   if (url.pathname === '/health') {
     res.writeHead(200);
     return res.end('ok');
