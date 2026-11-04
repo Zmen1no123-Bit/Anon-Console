@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANON ADMIN</title>
+  <style>
+    body { background:#000; color:#39ff14; font-family:'Courier New',monospace; margin:0; padding:16px; }
+    h1 { font-size:18px; letter-spacing:3px; margin:0 0 16px; }
+    input, button { font-family:inherit; background:transparent; color:#39ff14; border:1px solid #1f7a0c; padding:10px; font-size:15px; }
+    input { width:100%; box-sizing:border-box; margin-bottom:10px; }
+    button { width:100%; cursor:pointer; margin-bottom:8px; }
+    button:active { background:#39ff14; color:#000; }
+    .box { border:1px solid #1f7a0c; padding:12px; margin-top:12px; }
+    #out { white-space:pre-wrap; word-break:break-all; font-size:14px; min-height:2em; }
+    .code { font-size:22px; color:#fff; text-shadow:0 0 6px #39ff14; }
+    .row { display:flex; justify-content:space-between; align-items:center; gap:8px; margin:6px 0; }
+    .row button { width:auto; margin:0; padding:6px 10px; }
+    .off { color:#777; }
+    .err { color:#ff4040; }
+  </style>
+</head>
+<body>
+  <h1>[ ANON ADMIN ]</h1>
+
+  <label>ADMIN_TOKEN&gt;</label>
+  <input id="token" type="password" autocomplete="off" placeholder="token">
+
+  <button id="create">[ CRIAR CONVITE ]</button>
+  <button id="list">[ LISTAR CONVITES ]</button>
+
+  <div class="box">
+    <div id="out">Aguardando...</div>
+  </div>
+
+  <div class="box">
+    <div id="list-box"></div>
+  </div>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const out = (text, cls = '') => {
+      const el = $('#out');
+      el.className = cls;
+      el.textContent = text;
+    };
+    const headers = () => ({ 'x-admin-token': $('#token').value.trim() });
+
+    async function api(path, method = 'GET') {
+      const r = await fetch(path, { method, headers: headers() });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error || 'erro ' + r.status);
+      return data;
+    }
+
+    function renderList(items) {
+      const box = $('#list-box');
+      box.innerHTML = '';
+      if (!items.length) {
+        box.textContent = 'Nenhum convite.';
+        return;
+      }
+      items.forEach((inv) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        const span = document.createElement('span');
+        span.textContent = inv.code + (inv.active ? '' : '  (revogado)');
+        if (!inv.active) span.className = 'off';
+        row.appendChild(span);
+        if (inv.active) {
+          const btn = document.createElement('button');
+          btn.textContent = 'revogar';
+          btn.addEventListener('click', () => revoke(inv.code));
+          row.appendChild(btn);
+        }
+        box.appendChild(row);
+      });
+    }
+
+    async function listInvites() {
+      try {
+        const items = await api('/admin/invites');
+        renderList(items);
+        out('Lista atualizada.');
+      } catch (e) {
+        out('Erro: ' + e.message, 'err');
+      }
+    }
+
+    async function createInvite() {
+      try {
+        const data = await api('/admin/invites', 'POST');
+        out(data.code, 'code');
+        listInvites();
+      } catch (e) {
+        out('Erro: ' + e.message, 'err');
+      }
+    }
+
+    async function revoke(code) {
+      try {
+        await api('/admin/invites/' + encodeURIComponent(code), 'DELETE');
+        out('Convite ' + code + ' revogado.');
+        listInvites();
+      } catch (e) {
+        out('Erro: ' + e.message, 'err');
+      }
+    }
+
+    $('#create').addEventListener('click', createInvite);
+    $('#list').addEventListener('click', listInvites);
+  </script>
+</body>
+</html>
