@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANON TERMINAL</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="hacker">
+  <div id="scanlines"></div>
+
+  <main id="app">
+    <header>
+      <h1>ANON TERMINAL</h1>
+      <div class="status">
+        <span id="dot" class="dot off"></span>
+        <span id="status-text">OFFLINE</span>
+      </div>
+      <div class="controls">
+        <button id="theme-btn">[tema]</button>
+        <button id="sound-btn">[som]</button>
+      </div>
+    </header>
+
+    <section id="login" class="panel">
+      <pre id="boot"></pre>
+      <form id="login-form" autocomplete="off">
+        <label>INVITE&gt; <input id="invite" maxlength="16" required></label>
+        <label>NICK&gt;&nbsp;&nbsp;<input id="nick" maxlength="16" required></label>
+        <button type="submit">[ CONNECT ]</button>
+        <p id="login-error" class="err"></p>
+      </form>
+    </section>
+
+    <section id="chat" class="hidden">
+      <aside>
+        <div class="box">
+          <h3>[ USERS ONLINE ]</h3>
+          <ul id="users"></ul>
+        </div>
+
+        <div class="box">
+          <h3>[ ROOM ]</h3>
+          <div id="room-name">GENERAL</div>
+          <button id="general-btn">[ voltar ao GENERAL ]</button>
+
+          <form id="join-form">
+            <input id="room-code" placeholder="código da sala" maxlength="32">
+            <button type="submit">JOIN</button>
+          </form>
+
+          <form id="create-form">
+            <input id="new-name" placeholder="nome da sala" maxlength="20">
+            <input id="new-code" placeholder="código (4+)" maxlength="32">
+            <button type="submit">CREATE</button>
+          </form>
+        </div>
+      </aside>
+
+      <div class="main">
+        <div id="log"></div>
+        <form id="msg-form">
+          <span class="prompt">root@anon:~$</span>
+          <input id="msg-input" maxlength="500" autocomplete="off" autofocus>
+          <span class="caret">_</span>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
